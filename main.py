@@ -44,15 +44,22 @@ def checkPixel(pos, col):
     cx, cy = pos
     tx = cx + x0
     ty = cy + y0
-    while pya.pixel(tx, ty) != col:
+    if pya.pixel(tx, ty) != col:
         time.sleep(1)
-        pass
+        return False
+    return True
     
 
 def main():
     global posDict, binds
-    posDict = loadJson("pos")
-    binds = loadJson("binds")
+    try:
+        posDict = loadJson("pos")
+    except:
+        raise Exception("position json not found - try calibrating in settings")
+    try:
+        binds = loadJson("binds")
+    except:
+        raise Exception("binds json not found - try calibrating in settings")
 
     # ensure window is focused
     pya.getWindowsWithTitle("BloonsTD6")[0].activate() 
@@ -163,19 +170,20 @@ if __name__ == "__main__":
                 print("""INFO:
 For the duration of calibration ensure your game is on you primary monitor (you can move the window after)
 To move the btd6 window you can press Windows + Shift + Left or right arrow keys
-The steps in order are:
-    Churchill placement (click somewhere that churchill fits)
-    Super Monkey placement (click somewhere that supermonkey fits)
-    Super Monkey upgrade (click on the super monkey so that you can upgrade it to 0/2/3)
-    Now start the game (with space) and wait until it ends (NOT CLICKING AT ALL WHILE YOU WAIT)
-    Win check (after winning click somewhere on the white part of the next button (this is used to check when you have won))
-    Freeplay (click the freeplay button)
-    Restart (press escape twice to first remove the freeplay dialogue and then pause it - Then click the restart button)
-    Restart confirmation (Click the restart confirmation button)
-    Levelup (Click somewhere on the map that is not changing colour - this is used to see if the screen changes colour (you level up) and will then click off it automatically)
-                        """)
+The steps in order are:""")
+                steps = """Churchill placement (click somewhere that churchill fits)
+Super Monkey placement (click somewhere that supermonkey fits)
+Super Monkey upgrade (click on the super monkey so that you can upgrade it to 0/2/3 - then play (speed up) and DO NOT CLICK ANYWHERE until you win)
+Levelup (Click somewhere on the map that is not changing colour - this is used to see if the screen changes colour (you level up) and will then click off it automatically)
+Win check (after winning click somewhere on the white part of the next button (this is used to check when you have won))
+Freeplay (click the freeplay button)
+Restart (press escape twice to first remove the freeplay dialogue and then pause it - Then click the restart button)
+Restart confirmation (Click the restart confirmation button)"""
+                        
+                print(steps)
                 
                 print("Click location: ", list(poslist)[0])
+                print(steps.split("\n")[0])
                 poses = []
                 def whenClick(*args):
                     nonlocal counter
@@ -186,16 +194,19 @@ The steps in order are:
                         poses.append([args[0], args[1]])
                         counter += 1
                         print("Click location: ", list(poslist)[counter])
+                        print(steps.split("\n")[counter])
                         
                     
                 with Listener(on_click=whenClick) as listener:
                     listener.join()
                 newposes = {name: coords for name, coords in zip(poslist, poses)}
                 f.write(json.dumps(newposes))
+                print("Calibration complete!")
+                print("run the script again to use the macro")
 
 
         terminal.choice(resetBinds, resetPos, calibratePositions)
-
+    print("Welcome to my macro! it is recommended that you go into binds.json to adjust your keybinds \nso that the script does not press the wrong buttons")
     terminal.choice(runMacro, settings)
 
     
