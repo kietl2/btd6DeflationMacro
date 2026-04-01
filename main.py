@@ -174,14 +174,14 @@ if __name__ == "__main__":
         def unsure(): exit()
         def resetBinds():
             terminal.choice(sure, unsure)
-            with open("defaultbinds.json", "r") as defaultb:
+            with open("defaults.json", "r") as defaultb:
                 with open("binds.json", "w") as b:
-                    b.write(defaultb.read())
+                    b.write(defaultb.read().get("binds"))
         def resetPos():
             terminal.choice(sure, unsure)
-            with open("defaultpos.json", "r") as defaultp:
+            with open("defaults.json", "r") as defaultp:
                 with open("pos.json", "w") as p:
-                    p.write(defaultp.read())
+                    p.write(defaultp.read().get("pos"))
         
         def adjustDelays():
             print("If your computer is especially slow, you may need to slow down some of these (especially navSpeed)\nin order to not have the script fail and accidentally start playing freeplay")
