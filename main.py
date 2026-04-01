@@ -39,6 +39,10 @@ def main():
         binds = settingsDict.get("binds")
     except:
         raise Exception("binds json not found - try calibrating in settings")
+
+    keyboardDelay = timingsDict.get("keyboardDelay")
+    mouseDelay = timingsDict.get("mouseDelay")
+    navSpeed = timingsDict.get("navSpeed")
     
     
 
@@ -55,12 +59,12 @@ def main():
         tx = cx + x0
         ty = cy + y0
         pya.moveTo(tx, ty)
-        time.sleep(timingsDict.get("mouseDelay"))
+        time.sleep(mouseDelay)
         pya.click()
 
     def clickClack(key):
         keyboard.press(key)
-        time.sleep(timingsDict.get("keyboardDelay"))
+        time.sleep(keyboardDelay)
         keyboard.release(key)
 
     def checkPixel(pos, col):
@@ -68,7 +72,6 @@ def main():
         tx = cx + x0
         ty = cy + y0
         if pya.pixel(tx, ty) != col:
-            time.sleep(1)
             return False
         return True
 
@@ -117,17 +120,17 @@ def main():
         
             # win
             clicketyClack("winCheck") # next
-            time.sleep(timingsDict.get("navSpeed"))
+            time.sleep(navSpeed)
             clicketyClack("freeplay") # freeplay
 
             clickClack(Key.esc) # remove freeplay dialogue
-            time.sleep(timingsDict.get("navSpeed"))
+            time.sleep(navSpeed)
             clickClack(Key.esc) # pause
-            time.sleep(timingsDict.get("navSpeed"))
+            time.sleep(navSpeed)
             clicketyClack("restart") # restart
-            time.sleep(timingsDict.get("navSpeed"))
+            time.sleep(navSpeed)
             clicketyClack("restartConfirmation")
-            time.sleep(timingsDict.get("navSpeed"))
+            time.sleep(navSpeed)
             break
     
 
