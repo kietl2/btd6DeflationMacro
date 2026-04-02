@@ -6,9 +6,6 @@
     },
 
     "pos":  {
-        "cPlacement": [796, 426],
-        "smPlacement": [935, 426],
-        "smUpgrade": [935, 426],
         "levelup": [1915, 20],
         "winCheck": [933, 907],
         "freeplay": [1176, 849],
@@ -17,6 +14,21 @@
     },
 
     "binds":    {
+        "dart": "q",
+        "rangs": "w",
+        "bomb": "e",
+        "tack": "r",
+        "ice": "t",
+        "glue": "y",
+        "desperado": "",
+        "sniper": "z",
+        "sub": "x",
+        "boat": "z",
+        "ace": "v",
+        "heli": "b",
+        "mortar": "n",
+        "dartling": "m",
+        "wizard": "a",
         "hero": "u",
         "super": "s",
         "up0" : ",",
