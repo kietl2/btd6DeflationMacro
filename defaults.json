@@ -14,25 +14,8 @@
     },
 
     "binds":    {
-        "dart": "q",
-        "rangs": "w",
-        "bomb": "e",
-        "tack": "r",
-        "ice": "t",
-        "glue": "y",
-        "desperado": "",
-        "sniper": "z",
-        "sub": "x",
-        "boat": "z",
-        "ace": "v",
-        "heli": "b",
-        "mortar": "n",
-        "dartling": "m",
-        "wizard": "a",
-        "hero": "u",
-        "super": "s",
-        "up0" : ",",
-        "up1" : ".",
-        "up2" : "/"
+        "up0": ",",
+        "up1": ".",
+        "up2": "/"
     }
 }
