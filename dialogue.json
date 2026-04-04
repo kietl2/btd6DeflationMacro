@@ -1,14 +1,12 @@
 {
     "steps":
     [
-        "Churchill placement (click somewhere that churchill fits)",
-        "Super Monkey placement (click somewhere that supermonkey fits)",
-        "Super Monkey upgrade (click on the super monkey so that you can upgrade it to 0/2/3 - then play (speed up) and DO NOT CLICK ANYWHERE until you win)",
         "Levelup (Click somewhere on the map that is not changing colour - this is used to see if the screen changes colour (you level up) and will then click off it automatically). It is probably best to click on the very right of the monkey selection as it does not change colour.",
         "Win check (after winning click somewhere on the white part of the next button (this is used to check when you have won))",
         "Freeplay (click the freeplay button)",
         "Restart (press escape twice to first remove the freeplay dialogue and then pause it - Then click the restart button)",
-        "Restart confirmation (Click the restart confirmation button)"
+        "Restart confirmation (Click the restart confirmation button)",
+        "Ok now intentionally of your own will lose all your lives and click the white of the restart sign"
     ],
     "info":
         [

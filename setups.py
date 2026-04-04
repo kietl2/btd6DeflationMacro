@@ -39,7 +39,10 @@ class Setupper:
         self.keyboardDelay = delaysDict.get("keyboardDelay")
 
         self.upgradeBinds = [bindsDict.get(key) for key in bindsDict.keys()]
-        
+
+        self.recording = False
+        self.stopRecording = True
+
     def mClick(self, coords):
         cx, cy = coords
         tx = int(cx) + self.winx
@@ -57,132 +60,134 @@ class Setupper:
     def chooseMap(self):
         question = "Which map would you like?"
         choices = self.setupsDict.keys()
-        return self.setupsDict.get(TerminalAlt.pickAString(choices, question))
+        return TerminalAlt.pickAString(choices, question)
     
     def chooseSetup(self):
         question = "Which setup would you like to use"
         choices = self.chosenMapDict.keys()
         return self.chosenMapDict.get(TerminalAlt.pickAString(choices, question))
 
-    def parseTower(self, tower):
-        # parse each tower of the setup
-        # example tower "sm_935-426_023"
+    def parseSetup(self, tower):
+        # parse the setup
+        # example "sm_935-426_023"
         arguments = tower.split("_")
-        if len(arguments) > 2:
-            return {"placeBind": arguments[0],
-                    "position": arguments[1].split("-"),
-                    "upgrades": arguments[2]}
-        else:
-            return {"placeBind": arguments[0],
-                    "position": arguments[1].split("-")}
+        processedArguments = []
 
-    def upgradeTower(self, position, upgrades):
-        self.mClick(position)
-        for i, upgrade in enumerate(list(upgrades)):
-                count = int(upgrade)
-                for j in range(count):
-                    self.kbPress(self.upgradeBinds[i])
+        for argument in arguments:
+            if "-" in argument:
+                processedArguments.append(argument.split("-"))
+            else:
+                processedArguments.append(argument)
 
-    def sellTower(self, position):
-        if self.upgradeBinds[3] == "backspace":
-            sellBind = Key.backspace
-        else:
-            sellBind = self.upgradeBinds[3]
-        
-        self.mClick(position)
-        self.kbPress(sellBind)
-
-
-    def placeTower(self, towerDict):
-        placeBind = towerDict.get("placeBind")
-        position = towerDict.get("position")
-        upgrades = towerDict.get("upgrades", None)
-        if placeBind not in ("up", "sell"):
-            self.kbPress(placeBind)
-            self.mClick(position)
-        if placeBind == "sell":
-            self.sellTower(position)
-        if upgrades:
-            self.upgradeTower(position, upgrades)
-
-    def saveSetups(self):
-        with open("setups.json", "w") as setupsFile:
-            json.dump(self.setupsDict, setupsFile)
+        return processedArguments
     
     def placeSetup(self):
         # select map
-        self.chosenMapDict = self.chooseMap()
+        self.chosenMapDict = self.setupsDict.get(self.chooseMap())
         # select setup from map
         self.chosenSetup = self.chooseSetup()
         
-        # parse tower text
-        towerDicts = []
-        for tower in self.chosenSetup:
-            towerDict = self.parseTower(tower)
-            towerDicts.append(towerDict)
+        # parse setup text
+        self.instructions = self.parseSetup(self.chosenSetup)
         
-        print("you have 5 seconds")
+        print("you have 5 seconds to enter btd6")
         time.sleep(5)
+
         # place each tower
-        for towerDict in towerDicts:
-            self.placeTower(towerDict)
+        for instruction in self.instructions:
+            if instruction.__class__ == list:
+                self.mClick(instruction)
+            elif len(instruction) == 3:
+                for path, count in enumerate(list(instruction)):
+                    for i in range(int(count)):
+                        self.kbPress(self.upgradeBinds[path])
+            else:
+                fancyKeys = {
+                    "sell": Key.backspace
+                }
+                self.kbPress(fancyKeys.get(instruction, instruction))
+
 
     def whenClick(self, *args):
+        if not self.stopRecording:
+            return False
         if args[-2] == False:
             self.inputProcessor((args[0], args[1]))
+            
     def whenPress(self, *args):
+        if not self.stopRecording:
+            return False
         self.inputProcessor(args[0])
 
     def inputProcessor(self, inp):
-        print(inp)
-
-
+        if inp == Key.enter:
+            if self.recording:
+                self.stopRecording = False
+                self.mouse_listener.stop()
+                self.keyboard_listener.stop()
+            self.recording = True
+            pass
+        if self.recording:
+            if inp.__class__ == tuple:
+                self.newSetup.append("-".join(str(inpp) for inpp in inp))
+            else:
+                inp = str(inp).strip("'")
+                if inp in self.upgradeBinds:
+                    if not self.upgrading:
+                        self.upgrading = True
+                    self.activeUpgrades[self.upgradeBinds.index(inp)] += 1
+                else:
+                    if self.upgrading:
+                        self.upgrading = False
+                        self.newSetup.append("".join(str(x) for x in self.activeUpgrades))
+                        self.activeUpgrades = [0, 0, 0]
+                    
+                    if inp == str(Key.enter).strip("'"):
+                        return
+                    self.newSetup.append(inp)
 
     def appendSetup(self):
         newMap = TerminalAlt.pickAString(["new", "current"], "Would you like to enter a new map or use an existing one")
         if newMap == "current":
-            self.chosenMapDict = self.chooseMap()
+            mapName = self.chooseMap()
         else:
-            newMapName = TerminalAlt.enterData("Enter map name in lower case with dashes '-'")
-            self.chosenMapDict = {}
-
+            mapName = TerminalAlt.enterData("Enter map name in lower case with dashes '-'")
+            
         setupName = TerminalAlt.enterData("What should the setup be called? (should be in all caps with words separated by dashes '-')")
         
-        newSetup = []
+        self.newSetup = []
+        self.upgrading = False
+        self.activeUpgrades = [0, 0, 0]
         # input a setup here (big sad)
+        self.mouse_listener = mListener(on_click=self.whenClick)
+        self.keyboard_listener = kbListener(on_release=self.whenPress)
         print("It is now time to input the setup")
-        print("Each 'step' is composed of 1 of 3 things:")
-        print("1: placing a tower (and optionally upgrading it)")
-        print("2: selling a tower")
-        print("3: upgrading a tower")
-        print("In order to tell the program which of these you are inputting, you must:")
-        print("1: press a tower hotkey and click somewhere")
-        print("2: click somewhere (on a tower) then press the sell bind")
-        print("3: click somewhere then press the upgrade binds")
-        print("After each step, press enter")
-        print("When you are done, press enter twice in a row")
-        print("When you have your map open on deflation, press enter to begin")
-        mouse_listener = mListener(on_click=self.whenClick)
-        keyboard_listener = kbListener(on_release=self.whenPress)
-        mouse_listener.start()
-        keyboard_listener.start()
-        mouse_listener.join()
-        keyboard_listener.join()
-        time.sleep(100)
-        while True:
-            print("no more ear")
-            time.sleep(5)
-            pass
-        self.chosenMapDict.update({setupName: newSetup})
-        self.setupsDict.update(self.chosenMapDict)
-        self.saveSetups()
+        print("you will begin and end recording by pressing enter")
+        print("while recording only your key presses and mouse clicks are recorded")
+        print("this means you must know the hotkeys to place your chosen towers and also the upgrade buttons")
+        print("(defaults are ',' '.' and '/')")
+        print("")
+        print("you may now tab in and press enter to begin")
+        # listeners start and will stop themselves when you press enter twice
+        self.mouse_listener.start()
+        self.keyboard_listener.start()
+        self.mouse_listener.join()
+        self.keyboard_listener.join()
+
+
+        mapDict = {}
+        mapDict.update({setupName: "_".join(self.newSetup)})
+        self.setupsDict.update({mapName: mapDict})
+        
+        with open("setups.json", "w") as f:
+            json.dump(self.setupsDict, f, indent=4)
 
 
 if __name__ == "__main__":
     setupper = Setupper()
-    setupper.appendSetup()
+    setupper.placeSetup()
 
 
 
 # TODO:
-#   finish letting you input setups 
+#   upgrades need to be changed from ._._/_/_/ to 023

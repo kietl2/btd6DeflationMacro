@@ -10,7 +10,8 @@
         "winCheck": [933, 907],
         "freeplay": [1176, 849],
         "restart": [1059, 851],
-        "restartConfirmation": [1131, 721]
+        "restartConfirmation": [1131, 721],
+        "loseCheck": [934, 794]
     },
 
     "binds":    {
