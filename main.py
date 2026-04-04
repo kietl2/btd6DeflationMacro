@@ -179,7 +179,8 @@ if __name__ == "__main__":
     loadTimings()
 
     def runMacro():
-        setupper = setup.Setupper()
+        global setupper
+        setupper = setups.Setupper()
         while True:
             main()
     
