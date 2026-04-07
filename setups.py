@@ -96,7 +96,7 @@ class Setupper:
         for instruction in self.instructions:
             if instruction.__class__ == list:
                 self.mClick(instruction)
-            elif len(instruction) == 3:
+            elif (len(instruction) == 3) and (instructions.isnumeric()):
                 for path, count in enumerate(list(instruction)):
                     for i in range(int(count)):
                         self.kbPress(self.upgradeBinds[path])
