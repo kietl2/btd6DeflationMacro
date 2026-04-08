@@ -96,13 +96,14 @@ class Setupper:
         for instruction in self.instructions:
             if instruction.__class__ == list:
                 self.mClick(instruction)
-            elif len(instruction) == 3:
+            elif (len(instruction) == 3) and (instruction.isnumeric()):
                 for path, count in enumerate(list(instruction)):
                     for i in range(int(count)):
                         self.kbPress(self.upgradeBinds[path])
             else:
                 fancyKeys = {
-                    "sell": Key.backspace
+                    "sell": Key.backspace,
+                    "tab": Key.tab
                 }
                 self.kbPress(fancyKeys.get(instruction, instruction))
 
@@ -162,6 +163,10 @@ class Setupper:
         if inp_str == "Key.enter":
             return
 
+        if inp_str == "Key.tab":
+            self.newSetup.append("tab")
+            return
+        
         self.newSetup.append(inp_str)
 
     def appendSetup(self):
