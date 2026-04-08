@@ -141,7 +141,6 @@ class Setupper:
         if not self.recording:
             return
 
-        # Handle tuple input
         if isinstance(inp, tuple):
             self.newSetup.append("-".join(str(x) for x in inp))
             return
@@ -161,6 +160,9 @@ class Setupper:
 
         # Ignore Enter in recording stream
         if inp_str == "Key.enter":
+            return
+        if inp_str == "Key.tab":
+            self.newSetup.append("tab")
             return
 
         if inp_str == "Key.tab":
