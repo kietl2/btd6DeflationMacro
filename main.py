@@ -69,18 +69,22 @@ def main():
             
 
     def clicketyClack(name):
+        dellywelly = mouseDelay/2
         pos = posDict.get(name)
         cx, cy = pos
 
         tx = cx + x0
         ty = cy + y0
+        time.sleep(dellywelly)
         pya.moveTo(tx, ty)
-        time.sleep(mouseDelay)
+        time.sleep(dellywelly)
         pya.click()
 
     def clickClack(key):
+        dellywelly = keyboardDelay/2
+        time.sleep(dellywelly)
         keyboard.press(key)
-        time.sleep(keyboardDelay)
+        time.sleep(dellywelly)
         keyboard.release(key)
 
     def checkPixel(pos, col):
